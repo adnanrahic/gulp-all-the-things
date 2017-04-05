@@ -21,7 +21,7 @@ var paths = {
   dist: 'dist',
   distIndex: 'dist/index.html',
   distCSS: 'dist/**/*.css',
-  distJS: 'dist/**/*.js',
+  distJS: 'dist/**/*.js'
 };
 
 /**
