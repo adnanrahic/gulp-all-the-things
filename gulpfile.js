@@ -37,30 +37,30 @@ gulp.task('js', function () {
   return gulp.src(paths.srcJS).pipe(gulp.dest(paths.tmp));
 });
 
-gulp.task('copy', ['html', 'css', 'js']);
+gulp.task('copy', gulp.series('html', 'css', 'js'));
 
-gulp.task('inject', ['copy'], function () {
+gulp.task('inject', gulp.series('copy', function () {
   var css = gulp.src(paths.tmpCSS);
   var js = gulp.src(paths.tmpJS);
   return gulp.src(paths.tmpIndex)
     .pipe(inject( css, { relative:true } ))
     .pipe(inject( js, { relative:true } ))
     .pipe(gulp.dest(paths.tmp));
-});
+}));
 
-gulp.task('serve', ['inject'], function () {
+gulp.task('serve', gulp.series('inject', function () {
   return gulp.src(paths.tmp)
     .pipe(webserver({
       port: 3000,
 			livereload: true
     }));
-});
+}));
 
-gulp.task('watch', ['serve'], function () {
+gulp.task('watch', gulp.series('serve', function () {
 	gulp.watch(paths.src, ['inject']);
-});
+}));
 
-gulp.task('default', ['watch']);
+gulp.task('default', gulp.series('watch'));
 /**
  * DEVELOPMENT END
  */
@@ -87,20 +87,20 @@ gulp.task('js:dist', function () {
     .pipe(uglify())
     .pipe(gulp.dest(paths.dist));
 });
-gulp.task('copy:dist', ['html:dist', 'css:dist', 'js:dist']);
-gulp.task('inject:dist', ['copy:dist'], function () {
+gulp.task('copy:dist', gulp.series('html:dist', 'css:dist', 'js:dist'));
+gulp.task('inject:dist', gulp.series('copy:dist', function () {
   var css = gulp.src(paths.distCSS);
   var js = gulp.src(paths.distJS);
   return gulp.src(paths.distIndex)
     .pipe(inject( css, { relative:true } ))
     .pipe(inject( js, { relative:true } ))
     .pipe(gulp.dest(paths.dist));
-});
-gulp.task('build', ['inject:dist']);
+}));
+gulp.task('build', gulp.series('inject:dist'));
 /**
  * PRODUCTION END
  */
 
 gulp.task('clean', function () {
-  del([paths.tmp, paths.dist]);
+  return del([paths.tmp, paths.dist]);
 });
